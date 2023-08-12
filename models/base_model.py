@@ -3,13 +3,13 @@
 
 import uuid
 from datetime import datetime
-from models import storage
+import models
 
 
 class BaseModel:
     """A class that establishes shared features for future classes"""
     def __init__(self, *args, **kwargs):
-        """initialization of BaseModel"""
+        """iniitialization of BaseModel"""
         if kwargs:
             for key, value in kwargs.items():
                 if key == 'created_at' or key == 'updated_at':
@@ -27,7 +27,7 @@ class BaseModel:
     def save(self):
         """Updates the 'updated_at' attribute"""
         self.updated_at = datetime.now()
-        storage.save()
+        models.storage.save()
     
     def to_dict(self):
         """converts the instance attributes to a dictionary"""
