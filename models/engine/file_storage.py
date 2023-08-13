@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 """ file storage class """
 import json
 from models.base_model import BaseModel
@@ -15,6 +14,17 @@ class FileStorage:
     deserializes back to instance"""
     __file_path = "file.json"
     __objects = {}
+
+    # Include the new classes in the dictionary
+    classes = {
+        "BaseModel": BaseModel,
+        "User": User,
+        "Place": Place,
+        "State": State,
+        "City": City,
+        "Amenity": Amenity,
+        "Review": Review
+    }
 
     def all(self):
         """Returns the dictionary of objects"""
@@ -39,10 +49,11 @@ class FileStorage:
         try:
             with open(FileStorage.__file_path, 'r') as file:
                 obj_dict = json.load(file)
-                from models.base_model import BaseModel
                 for key, value in obj_dict.items():
                     class_name = value['__class__']
-                    class_obj = eval(class_name)
-                    FileStorage.__objects[key] = class_obj(**value)
+                    if class_name in FileStorage.classes:
+                        class_obj = FileStorage.classes[class_name]
+                        FileStorage.__objects[key] = class_obj(**value)
         except FileNotFoundError:
             pass
+
