@@ -2,6 +2,7 @@
 """ console base"""
 
 import cmd
+from shlex import split
 from models.base_model import BaseModel
 from models import storage
 from models.user import User
@@ -37,7 +38,7 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_create(self, arg):
-        """Creates a new instance of a class, saves it (to the JSON file) and prints the id."""
+        """Creates a new instance of a class, saves it"""
         args = arg.split()
         if not args:
             print("** class name missing **")
@@ -76,7 +77,7 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
 
     def do_destroy(self, arg):
-        """Deletes an instance based on the class name and id (save the change into the JSON file)."""
+        """deletes an instance based on the class name and id"""
         args = arg.split()
         if not args:
             print("** class name missing **")
@@ -100,25 +101,28 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
 
     def do_all(self, arg):
-        """Prints all string representation of all instances based on the class name."""
+        """ string representation of instances """
         args = arg.split()
 
-        if not args:
-            instances = [str(instance) for instance in storage.all().values()]
-        elif args[0] in HBNBCommand.classes:
-            instances = [
-                str(value) for key, value in storage.all().items()
-                if value.__class__.__name__ == args[0]
-            ]
-        else:
+        if len(args) > 0 and args[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
-            return
 
-        for instance in instances:
-            print(instance)
+        else:
+
+            instances = []
+
+            for instance in storage.all().values():
+
+                if len(args) > 0 and args[0] == instance.__class__.__name__:
+                    instances.append(obj.__str__())
+
+                elif len(args) == 0:
+                    instances.append(obj.__str__())
+
+            print(instances)
 
     def do_update(self, arg):
-        """Updates an instance based on the class name and id by adding or updating attribute."""
+        """upddates an instance based on the class name"""
         args = arg.split()
         if not args:
             print("** class name missing **")
