@@ -100,18 +100,24 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
 
     def do_all(self, arg):
-        """Prints all string representation of all instances based or not on the class name."""
+        """Prints all string representation of all instances based on the class name."""
         args = arg.split()
 
         if not args:
             instances = [str(instance) for instance in storage.all().values()]
         elif args[0] in HBNBCommand.classes:
-            instances = [str(value) for key, value in storage.all().items() if value.__class__.__name__ == args[0]]
+            instances = [
+                str(value) for key, value in storage.all().items()
+                if value.__class__.__name__ == args[0]
+            ]
         else:
             print("** class doesn't exist **")
             return
 
-        print(instances)
+        print("Instances:", instances)  # Debug print
+
+        for instance in instances:
+            print(instance)  # Print each instance
 
     def do_update(self, arg):
         """Updates an instance based on the class name and id by adding or updating attribute."""
