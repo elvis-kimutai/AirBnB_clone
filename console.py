@@ -4,10 +4,14 @@
 import cmd
 from models.base_model import BaseModel
 from models import storage
+from models.user import User
 
 class HBNBCommand(cmd.Cmd):
     prompt = "(hbnb) "
-    classes = {"BaseModel": BaseModel}
+    classes = {
+            "BaseModel": BaseModel,
+            "User": User,
+    }
 
     def do_quit(self, arg):
         """quit command to exit """
