@@ -1,59 +1,90 @@
+#!/usr/bin/pyton3
+
 import unittest
-import os
-import sys
+from unittest.mock import patch
 from io import StringIO
+import os
 from console import HBNBCommand
-from models import storage
-from models.base_model import BaseModel
-from models.user import User
-from models.place import Place
-from models.state import State
-from models.city import City
-from models.amenity import Amenity
-from models.review import Review
 
-class TestConsole(unittest.TestCase):
-
+class TestHBNBCommand(unittest.TestCase):
     def setUp(self):
-        """Runs before each test"""
         self.console = HBNBCommand()
-        sys.stdout = StringIO()  # Redirect stdout for testing
 
     def tearDown(self):
-        """Runs after each test"""
-        sys.stdout = sys.__stdout__  # Restore stdout
+        pass
 
-    def test_quit(self):
-        """Test the quit command"""
-        self.assertTrue(self.console.onecmd("quit"))
+    def test_quit_command(self):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            self.assertTrue(self.console.onecmd("quit"))
+            self.assertEqual(mock_stdout.getvalue().strip(), "")
 
-    def test_EOF(self):
-        """Test the EOF command"""
-        self.assertTrue(self.console.onecmd("EOF"))
+    def test_EOF_command(self):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            self.assertTrue(self.console.onecmd("EOF"))
+            self.assertEqual(mock_stdout.getvalue().strip(), "")
 
-    def test_create(self):
-        """Test the create command"""
-        self.console.onecmd("create BaseModel")
-        output = sys.stdout.getvalue().strip()
-        self.assertTrue(output.isalnum())  # Check if ID is alphanumeric
+    def test_create_command(self):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            self.console.onecmd("create User")
+            output = mock_stdout.getvalue().strip()
+            self.assertTrue(len(output) == 36)  # Length of UUID
+            self.assertTrue(output.isalnum())
 
-    def test_show(self):
-        """Test the show command"""
-        bm = BaseModel()
-        bm_id = bm.id
-        self.console.onecmd("show BaseModel {}".format(bm_id))
-        output = sys.stdout.getvalue().strip()
-        self.assertIn(bm_id, output)  # Check if ID is present in output
+    def test_show_command(self):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            self.console.onecmd("show User")
+            self.assertEqual(mock_stdout.getvalue().strip(), "** class name missing **")
 
-    def test_all(self):
-        """Test the all command"""
-        bm = BaseModel()
-        self.console.onecmd("all BaseModel")
-        output = sys.stdout.getvalue().strip()
-        self.assertIn(str(bm), output)  # Check if BaseModel is in output
+            self.console.onecmd("create User")
+            output = mock_stdout.getvalue().strip()
+            instance_id = output.split()[-1]
 
-    # Add more test methods for other commands as needed
+            mock_stdout.truncate(0)  # Clear the mock_stdout buffer
+            self.console.onecmd(f"show User {instance_id}")
+            self.assertIn("User", mock_stdout.getvalue())
+
+    
+    def test_destroy_command(self):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            self.console.onecmd("destroy User")
+            self.assertEqual(mock_stdout.getvalue().strip(), "** class name missing **")
+
+            self.console.onecmd("create User")
+            output = mock_stdout.getvalue().strip()
+            instance_id = output.split()[-1]
+
+            mock_stdout.truncate(0)  # Clear the mock_stdout buffer
+            self.console.onecmd(f"destroy User {instance_id}")
+            self.assertEqual(mock_stdout.getvalue().strip(), "")
+
+    def test_all_command(self):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            self.console.onecmd("all User")
+            self.assertEqual(mock_stdout.getvalue().strip(), "")
+
+            self.console.onecmd("create User")
+            self.console.onecmd("create User")
+            self.console.onecmd("create Place")
+            self.console.onecmd("all User")
+            output = mock_stdout.getvalue().strip()
+            self.assertEqual(len(output.split("\n")), 2)  # Should have 2 User instances
+
+    def test_update_command(self):
+        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            self.console.onecmd("update User")
+            self.assertEqual(mock_stdout.getvalue().strip(), "** class name missing **")
+
+            self.console.onecmd("create User")
+            output = mock_stdout.getvalue().strip()
+            instance_id = output.split()[-1]
+
+            self.console.onecmd(f"update User {instance_id} name John")
+            self.assertEqual(mock_stdout.getvalue().strip(), "** attribute name missing **")
+
+            self.console.onecmd(f"update User {instance_id} first_name John")
+            self.console.onecmd(f"show User {instance_id}")
+            self.assertIn("John", mock_stdout.getvalue())
+
 
 if __name__ == '__main__':
     unittest.main()
-
