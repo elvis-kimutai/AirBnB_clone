@@ -11,14 +11,17 @@ from models.city import City
 from models.amenity import Amenity
 from models.review import Review
 
+
 class FileStorage:
     """
     A class that serializes instances to a JSON file and
-    deserializes back to instance"""
+    deserializes it back to instance
+     """
     __file_path = "file.json"
     __objects = {}
 
-    # Include the new classes in the dictionary
+    __file_path = "file.json"
+    __objects = {}
     classes = {
         "BaseModel": BaseModel,
         "User": User,
@@ -46,7 +49,7 @@ class FileStorage:
 
     def reload(self):
         """
-        Deserializes JSON file and restores the object and
+        Deserializes JSON file and restores and
         if the file does not exist it does nothing
         """
         try:
@@ -59,4 +62,3 @@ class FileStorage:
                         self.__objects[key] = class_obj(**value)
         except FileNotFoundError:
             pass
-
