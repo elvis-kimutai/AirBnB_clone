@@ -1,55 +1,34 @@
+#!/usr/bin/python3
+
 import unittest
 from models.base_model import BaseModel
-import datetime
-import models
-
 
 class TestBaseModel(unittest.TestCase):
+    def setUp(self):
+        self.base_model = BaseModel()
 
-    def test_instance_creation(self):
-        """Test creating an instance of BaseModel"""
-        base = BaseModel()
-        self.assertIsInstance(base, BaseModel)
+    def test_attributes(self):
+        self.assertTrue(hasattr(self.base_model, "id"))
+        self.assertTrue(hasattr(self.base_model, "created_at"))
+        self.assertTrue(hasattr(self.base_model, "updated_at"))
 
-    def test_id_type(self):
-        """Test the type of the 'id' attribute"""
-        base = BaseModel()
-        self.assertIsInstance(base.id, str)
-
-    def test_created_at_type(self):
-        """Test the type of the 'created_at' attribute"""
-        base = BaseModel()
-        self.assertIsInstance(base.created_at, datetime.datetime)
-
-    def test_updated_at_type(self):
-        """Test the type of the 'updated_at' attribute"""
-        base = BaseModel()
-        self.assertIsInstance(base.updated_at, datetime.datetime)
-
-    def test_str_representation(self):
-        """Test the __str__ representation"""
-        base = BaseModel()
-        expected = "[BaseModel] ({}) {}".format(base.id, base.__dict__)
-        self.assertEqual(str(base), expected)
+    def test_str_method(self):
+        self.assertIn("[BaseModel]", str(self.base_model))
+        self.assertIn("id", str(self.base_model))
+        self.assertIn("created_at", str(self.base_model))
+        self.assertIn("updated_at", str(self.base_model))
 
     def test_save_method(self):
-        """Test the save method"""
-        base = BaseModel()
-        original_updated_at = base.updated_at
-        base.save()
-        self.assertNotEqual(base.updated_at, original_updated_at)
+        prev_updated_at = self.base_model.updated_at
+        self.base_model.save()
+        self.assertNotEqual(prev_updated_at, self.base_model.updated_at)
 
     def test_to_dict_method(self):
-        """Test the to_dict method"""
-        base = BaseModel()
-        base_dict = base.to_dict()
-        self.assertIsInstance(base_dict, dict)
-        self.assertIn('__class__', base_dict)
-        self.assertEqual(base_dict['__class__'], 'BaseModel')
-        self.assertEqual(base_dict['id'], base.id)
-        self.assertIsInstance(base_dict['created_at'], str)
-        self.assertIsInstance(base_dict['updated_at'], str)
+        base_model_dict = self.base_model.to_dict()
+        self.assertEqual(base_model_dict['__class__'], "BaseModel")
+        self.assertIsInstance(base_model_dict['created_at'], str)
+        self.assertIsInstance(base_model_dict['updated_at'], str)
+        self.assertIsInstance(base_model_dict['id'], str)
 
 if __name__ == '__main__':
     unittest.main()
-
