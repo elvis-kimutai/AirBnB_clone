@@ -3,6 +3,7 @@
 
 
 import cmd
+import re
 import models
 from models import storage
 from models.base_model import BaseModel
@@ -156,5 +157,50 @@ class HBNBCommand(cmd.Cmd):
         setattr(instance, attribute_name, attribute_value)
         instance.save()
 
+    def default(self, arg):
+        """Default behaviour for cmd"""
+        ins_dict = {
+            "all": self.do_all,
+            "show": self.do_show,
+            "destroy": self.do_destroy,
+            "update": self.do_update,
+            "create": self.do_create,
+            "count": self.do_count
+        }
+        match = re.search(r"\.", arg)
+        if match is not None:
+
+            args = [arg[:match.span()[0]], arg[match.span()[1]:]]
+            match = re.search(r"\((.*?)\)", args[1])
+
+            if match is not None:
+                command = [args[1][:match.span()[0]], match.group()[1:-1]]
+
+                if command[0] in ins_dict.keys():
+                    call = "{} {}".format(args[0], command[1])
+
+                    return ins_dict[command[0]](call)
+
+        print("*** Unknown syntax: {}".format(arg))
+        return False
+
+    def do_count(self, arg):
+        """Count the number of instances of a class"""
+        args = arg.split()
+        if not args:
+            print("** class name missing **")
+            return
+
+        class_name = args[0]
+        if class_name not in HBNBCommand.classes:
+            print("** class doesn't exist **")
+            return
+
+        instance_count = 0
+        for instance in storage.all().values():
+            if instance.__class__.__name__ == class_name:
+                instance_count += 1
+
+        print(instance_count)
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
